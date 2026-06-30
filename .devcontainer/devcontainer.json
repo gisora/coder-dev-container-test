@@ -1,0 +1,30 @@
+// For format details, see https://aka.ms/devcontainer.json
+{
+	"name": "Python 3.14 + uv",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"remoteUser": "vscode",
+	"containerEnv": {
+		"UV_LINK_MODE": "copy"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-python.debugpy",
+				"ms-toolsai.jupyter",
+				"charliermarsh.ruff"
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+				"[python]": {
+					"editor.defaultFormatter": "charliermarsh.ruff"
+				}
+			}
+		}
+	},
+	"onCreateCommand": ".devcontainer/on-create.sh",
+	"postCreateCommand": ".devcontainer/post-create.sh"
+}
