@@ -4,6 +4,7 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
+	"workspaceFolder": "/workspaces/coder-dev-container-test",
 	"remoteUser": "vscode",
 	"containerEnv": {
 		"UV_LINK_MODE": "copy"
