@@ -26,6 +26,6 @@
 			}
 		}
 	},
-	"onCreateCommand": ".devcontainer/on-create.sh",
-	"postCreateCommand": ".devcontainer/post-create.sh"
+	"onCreateCommand": "bash .devcontainer/on-create.sh",
+	"postCreateCommand": "bash .devcontainer/post-create.sh"
 }
