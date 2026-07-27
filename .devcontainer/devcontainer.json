@@ -11,6 +11,10 @@
 	"containerEnv": {
 		"UV_LINK_MODE": "copy"
 	},
+	"runArgs": [
+		"--security-opt",
+		"no-new-privileges=false"
+	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
