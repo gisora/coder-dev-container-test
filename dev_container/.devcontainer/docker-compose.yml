@@ -1,0 +1,146 @@
+# Docker Compose for DSP IDS local development sidecars.
+#
+# This file is referenced by .devcontainer/devcontainer.json via the
+# "dockerComposeFile" property. The dev container itself is the "app"
+# service; the sidecars below share the same Docker network so that
+# the Spring Boot services can reach them using the same hostnames
+# they use in OpenShift (isis-db, isis-redis, rabbitmq, isis-elastic,
+# isis-consul).
+#
+# Ports are mapped to localhost so the services can also be reached
+# from the host or from other tools running outside the compose network.
+#
+# Usage (automatic via devcontainer):
+#   When the dev container starts, VS Code / Dev Containers will run
+#   `docker compose -f docker-compose.yml up` automatically.
+#
+# Manual usage (from inside the dev container, with the Podman/Docker
+# socket mounted):
+#   docker compose -f .devcontainer/docker-compose.yml up -d
+#
+# Connection details (match properties/*.yml defaults):
+#   PostgreSQL  — host: isis-db  port: 12232  db: postgres  user: postgres  pass: 123456
+#   Redis       — host: isis-redis  port: 12261
+#   RabbitMQ    — host: rabbitmq  port: 5672 (AMQP) / 15672 (management)  user: admin  pass: V8aRvrDCYRMStqzy
+#   Elasticsearch — host: isis-elastic  port: 9200 (HTTP) / 9300 (transport)
+#   Consul      — host: isis-consul  port: 8500
+
+services:
+  # ───────────────────────────────────────────────────────────────
+  # Dev container (the app itself)
+  # ───────────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspaces/dsp-ids:cached
+      - maven-cache:/home/vscode/.m2
+      - gradle-cache:/home/vscode/.gradle
+    # Workaround for devcontainers/features#1480: applying features (java,
+    # github-cli) changes /tmp mode from 1777 to 0755 under Podman, which breaks
+    # `mkdir -p /tmp/.X11-unix` during VS Code X11 forwarding setup. Forcing /tmp
+    # to a tmpfs with mode 1777 restores the expected sticky-bit permissions.
+    #
+    # Uses the compose `tmpfs` short syntax (a string) so the raw options are
+    # passed directly to the kernel, which interprets mode=1777 as OCTAL. The
+    # long-form `volumes[].tmpfs.mode` field is a DECIMAL integer that
+    # Docker/Podman re-formats with %o, making it impossible to express octal
+    # 1777 correctly (1023 decimal works but is obscure and fragile).
+    tmpfs:
+      - /tmp:rw,exec,nosuid,nodev,mode=1777
+    command: sleep infinity
+    depends_on:
+      - isis-db
+      - isis-redis
+      - rabbitmq
+      - isis-elastic
+      - isis-consul
+    # All services share the default compose network, so the app container
+    # can reach sidecars by their service names (isis-db, isis-redis, etc.).
+
+  # ───────────────────────────────────────────────────────────────
+  # PostgreSQL 13 — matches libs/postgres Dockerfile
+  # All service databases are created via init.sql.
+  # Port 12232 matches properties/*.yml (isis-db:12232).
+  # ───────────────────────────────────────────────────────────────
+  isis-db:
+    image: postgres:13
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: "123456"
+    ports:
+      - "12232:12232"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: postgres -p 12232
+
+  # ───────────────────────────────────────────────────────────────
+  # Redis — session cache for web, credentialsIdp, ldapIdp
+  # Port 12261 matches properties/web.yml (isis-redis:12261).
+  # ───────────────────────────────────────────────────────────────
+  isis-redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "12261:6379"
+
+  # ───────────────────────────────────────────────────────────────
+  # RabbitMQ 3.9.5 (management) — matches docker/rabbitMq/Dockerfile
+  # Includes delayed-message-exchange and consistent-hash-exchange plugins.
+  # Port 5672 (AMQP) + 15672 (management UI).
+  # ───────────────────────────────────────────────────────────────
+  rabbitmq:
+    build:
+      context: ./rabbitmq
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "V8aRvrDCYRMStqzy"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    # Self-contained: builds from .devcontainer/rabbitmq/Dockerfile which
+    # installs curl, the delayed-message-exchange plugin and enables the
+    # consistent-hash-exchange plugin. Config/definitions are baked in.
+
+  # ───────────────────────────────────────────────────────────────
+  # Elasticsearch 6.8.20 — matches docker/elastic/Dockerfile
+  # Includes analysis-icu plugin.
+  # Port 9200 (HTTP) + 9300 (transport) match properties/*.yml.
+  # ───────────────────────────────────────────────────────────────
+  isis-elastic:
+    # Build from the self-contained .devcontainer/elastic/Dockerfile so the
+    # analysis-icu plugin is baked in at build time. Avoids re-installing the
+    # plugin on every container start and bypassing the base image's entrypoint.
+    build:
+      context: ./elastic
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+
+  # ───────────────────────────────────────────────────────────────
+  # Consul — service discovery (spring.cloud.consul.host: isis-consul)
+  # Port 8500 (UI/API) + 8600 (DNS).
+  # ───────────────────────────────────────────────────────────────
+  isis-consul:
+    image: hashicorp/consul:1.15
+    restart: unless-stopped
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+
+volumes:
+  postgres-data:
+  elastic-data:
+  maven-cache:
+  gradle-cache:

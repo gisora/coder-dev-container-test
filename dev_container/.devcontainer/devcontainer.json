@@ -1,0 +1,91 @@
+{
+    "name": "DSP IDS (Local Java 21 + Maven + Sidecars)",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspaces/dsp-ids",
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "21",
+            "jdkDistro": "tem",
+            "installMaven": "true",
+            "mavenVersion": "latest",
+            "gradleVersion": "none"
+        },
+        // nodeGypDependencies is false because enabling it runs `apt-get update`
+        // inside the feature install script, which fails during build under
+        // Podman: earlier features (java, github-cli) change /tmp from 1777 to
+        // 0755, so apt cannot create temp files in /tmp. The --tmpfs=/tmp runArg
+        // only applies at container runtime, not during image build. The web-ui
+        // project (webpack, babel, grunt, TypeScript) does not need node-gyp.
+        //
+        // version "20": pinned because node-sass@9.0.0 (a project dependency)
+        // ships prebuilt native binaries only for Node module versions 93–115
+        // (node 16–20). Node 22+ (module version 127+) has no matching binary
+        // and would force a from-source compile that fails. This also matches
+        // the project's declared "engines": { "node": "^20.15.1" }.
+        //
+        // npmVersion "10.8.2": the version bundled with node 20. npm 10 enforces
+        // peer deps strictly, so web-ui installs require --legacy-peer-deps
+        // (see web-ui/.npmrc) due to the bpmn-js@5 / bpmn-js-properties-panel@0.32
+        // peer mismatch.
+        "ghcr.io/devcontainers/features/node:2.1.0": {
+            "version": "20",
+            "nodeGypDependencies": false,
+            "npmVersion": "10.8.2"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "forwardPorts": [
+        // PostgreSQL
+        12232,
+        // Redis
+        12261,
+        // RabbitMQ AMQP + management UI
+        5672,
+        15672,
+        // Elasticsearch HTTP + transport
+        9200,
+        9300,
+        // Consul UI/API + DNS
+        8500,
+        8600
+    ],
+    // The /tmp tmpfs workaround for devcontainers/features#1480 is now handled
+    // directly in docker-compose.yml via a tmpfs volume on the app service.
+    "postCreateCommand": "java -version && mvn -version && node --version && npm --version",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack",
+                "vscjava.vscode-maven",
+                "vscjava.vscode-spring-initializr",
+                "vmware.vscode-spring-boot",
+                "redhat.fabric8-analytics",
+                "github.vscode-pull-request-github",
+                "ms-azuretools.vscode-docker",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode"
+            ],
+            "settings": {
+                "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+                "java.import.maven.enabled": true,
+                "maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn"
+            }
+        }
+    },
+    "remoteUser": "vscode",
+    // Disable the automatic UID/GID remap step. Under Podman, the Dev Containers
+    // CLI runs a separate `podman build` with BASE_IMAGE=localhost/<image>, but
+    // Podman interprets the `localhost/` prefix as a registry hostname (port 80)
+    // rather than a local image reference, so the pull fails with
+    // "connection refused". The remap is unnecessary here anyway: the `vscode`
+    // user in mcr.microsoft.com/devcontainers/base:debian already has UID/GID
+    // 1000, matching the host user.
+    "updateRemoteUserUID": false,
+    "mounts": [
+        "source=${localEnv:XDG_RUNTIME_DIR}/podman/podman.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "containerEnv": {
+        "DOCKER_HOST": "unix:///var/run/docker.sock"
+    }
+}
