@@ -1,10 +1,12 @@
-// For format details, see https://aka.ms/devcontainer.json
 {
-	"name": "Python 3.14 + uv",
+	"name": "Base Coder Container",
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
 	"workspaceFolder": "/workspaces/coder-dev-container-test",
+	"features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
 	"remoteUser": "vscode",
 	"containerEnv": {
 		"UV_LINK_MODE": "copy"
