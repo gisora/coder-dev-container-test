@@ -6,24 +6,28 @@
 	"workspaceFolder": "/workspaces/coder-dev-container-test",
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {
-			"username": "vscode"
-		},
-		"ghcr.io/devcontainers/features/github-cli:1": {
-			"installDirectlyFromGitHubRelease": "false"
-		}
+			"installZsh": false,
+            "configureZshAsDefaultShell": false,
+            "installOhMyZsh": false,
+            "installOhMyZshConfig":  false,
+        	"upgradePackages": true,
+        	"username": "vscode",
+        	"userUid": "automatic",
+            "userGid": "automatic",
+            "nonFreePackages": false,
+            "installSsl": true
+		}//,
+		// "ghcr.io/devcontainers/features/github-cli:1": {
+		// 	"installDirectlyFromGitHubRelease": "false"
+		// }
 	},
 	"remoteUser": "vscode",
-	// "containerEnv": {
-	// 	"UV_LINK_MODE": "copy"
-	// },
-	// "runArgs": [
-	//  	"--name",
-	//  	"coder-base-devcontainer"
-	// ],
+	// "containerEnv": {},
+	// "runArgs": ["--name", "coder-base-devcontainer"],
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"github.vscode-pull-request-github"
+				// "github.vscode-pull-request-github"
 			],
 			"settings": {}
 		}
