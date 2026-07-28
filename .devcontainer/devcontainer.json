@@ -1,5 +1,5 @@
 {
-	"name": "Base Coder Container",
+	"name": "Coder DevContainer (Base Debian)",
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
