@@ -21,10 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     passt \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Configure Podman to run rootless by default for the vscode user.
-# The subuid/subgid ranges are already set by the common-utils feature.
-RUN mkdir -p /home/vscode/.config/containers && \
-    echo '[containers]' > /home/vscode/.config/containers/containers.conf && \
-    echo 'netns = "slirp4netns"' >> /home/vscode/.config/containers/containers.conf && \
-    echo 'default_rootless_storage_driver = "overlay"' >> /home/vscode/.config/containers/containers.conf && \
-    chown -R vscode:vscode /home/vscode/.config
+# Configure Podman for rootless mode (system-wide config, doesn't need the
+# vscode user which is created later by the common-utils feature).
+RUN mkdir -p /etc/containers && \
+    printf '[containers]\nnetns = "slirp4netns"\ndefault_rootless_storage_driver = "overlay"\n' \
+    > /etc/containers/containers.conf

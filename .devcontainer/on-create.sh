@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-echo "on-create"
-
-# set -euo pipefail
+set -euo pipefail
 
 # cd "${containerWorkspaceFolder:-/workspaces/coder-dev-container-test}"
 

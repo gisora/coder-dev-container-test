@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo "post-create"
-
 set -euo pipefail
 
 # Initialize rootless Podman for the vscode user.
