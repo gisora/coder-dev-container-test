@@ -11,8 +11,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         openssh-client \
         podman \
         procps \
-        skopeo \
-        uidmap \
         unzip \
         vim \
         wget \

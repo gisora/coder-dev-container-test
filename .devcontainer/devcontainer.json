@@ -5,31 +5,22 @@
 	},
 	"workspaceFolder": "/workspaces/coder-dev-container-test",
 	"features": {
-        "ghcr.io/devcontainers/features/github-cli:1": {}
-    },
-	"remoteUser": "vscode",
-	"containerEnv": {
-		"UV_LINK_MODE": "copy"
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
-	"runArgs": [
-		"--security-opt",
-		"no-new-privileges=false"
-	],
+	"remoteUser": "vscode",
+	// "containerEnv": {
+	// 	"UV_LINK_MODE": "copy"
+	// },
+	// "runArgs": [
+	// 	"--security-opt",
+	// 	"no-new-privileges=false"
+	// ],
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-python.python",
-				"ms-python.vscode-pylance",
-				"ms-python.debugpy",
-				"ms-toolsai.jupyter",
-				"charliermarsh.ruff"
+				"github.vscode-pull-request-github"
 			],
-			"settings": {
-				"python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
-				"[python]": {
-					"editor.defaultFormatter": "charliermarsh.ruff"
-				}
-			}
+			"settings": {}
 		}
 	},
 	"onCreateCommand": ".devcontainer/on-create.sh",
