@@ -16,7 +16,8 @@
             "userGid": "automatic",
             "nonFreePackages": false,
             "installSsl": true
-		}
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 	"containerUser": "vscode",
 	// "containerEnv": {},
