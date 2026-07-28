@@ -2,14 +2,18 @@
 
 set -euo pipefail
 
-# Initialize rootless Podman for the vscode user.
-# This runs as the containerUser (vscode), not root.
-# podman system init sets up the rootless storage and runtime environment.
+# Check rootless Podman availability.
+# Note: podman system init was added in Podman 5.5+, but Debian trixie ships 5.4.
 if command -v podman >/dev/null 2>&1; then
-    echo "Initializing rootless Podman..."
-    podman system init
-    echo "Podman initialized. Testing with 'podman info'..."
-    podman info >/dev/null 2>&1 && echo "Podman is ready." || echo "Podman info failed (may need a shell re-login for subuid/subgid to take effect)."
+    echo "Podman $(podman --version)"
+    if podman info >/dev/null 2>&1; then
+        echo "Podman rootless is ready."
+    else
+        echo "WARNING: Podman rootless is not fully functional in this container."
+        echo "This is likely due to security restrictions (no-new-privileges) blocking"
+        echo "newuidmap/newgidmap from writing to /proc/self/uid_map."
+        echo "Rootless Podman requires the container runtime to allow user namespace creation."
+    fi
 fi
 
 # cd "${containerWorkspaceFolder:-/workspaces/coder-dev-container-test}"
