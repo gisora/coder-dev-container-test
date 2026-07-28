@@ -17,7 +17,8 @@
             "nonFreePackages": false,
             "installSsl": true
 		},
-		"ghcr.io/devcontainers/features/github-cli:1": {}
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/git-lfs:1": {}
 	},
 	"containerUser": "vscode",
 	// "containerEnv": {},
