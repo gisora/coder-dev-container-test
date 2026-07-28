@@ -21,7 +21,7 @@
 		// 	"installDirectlyFromGitHubRelease": "false"
 		// }
 	},
-	"remoteUser": "vscode",
+	"containerUser": "vscode",
 	// "containerEnv": {},
 	// "runArgs": ["--name", "coder-base-devcontainer"],
 	"customizations": {
