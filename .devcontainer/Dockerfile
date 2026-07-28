@@ -1,20 +1,10 @@
 FROM mcr.microsoft.com/devcontainers/base:debian
 
-# Install essential development tools
+# common-utils feature handles: curl, git, jq, wget, vim-tiny, nano, unzip, zip,
+# openssh-client, gnupg2, procps, htop, less, tree, sudo, locales, ca-certificates, etc.
+# Only install what the features don't provide:
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
-        ca-certificates \
-        curl \
-        git \
-        gnupg \
-        jq \
-        openssh-client \
-        podman \
-        procps \
-        unzip \
-        vim \
-        wget \
-        zip \
+    && apt-get -y install --no-install-recommends podman vim \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # # Create a non-root developer user

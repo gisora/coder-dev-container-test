@@ -5,16 +5,21 @@
 	},
 	"workspaceFolder": "/workspaces/coder-dev-container-test",
 	"features": {
-		"ghcr.io/devcontainers/features/github-cli:1": {}
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"username": "vscode"
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"installDirectlyFromGitHubRelease": "false"
+		}
 	},
 	"remoteUser": "vscode",
 	// "containerEnv": {
 	// 	"UV_LINK_MODE": "copy"
 	// },
-	"runArgs": [
-	 	"--name",
-	 	"coder-base-devcontainer"
-	],
+	// "runArgs": [
+	//  	"--name",
+	//  	"coder-base-devcontainer"
+	// ],
 	"customizations": {
 		"vscode": {
 			"extensions": [
