@@ -16,10 +16,7 @@
             "userGid": "automatic",
             "nonFreePackages": false,
             "installSsl": true
-		}//,
-		// "ghcr.io/devcontainers/features/github-cli:1": {
-		// 	"installDirectlyFromGitHubRelease": "false"
-		// }
+		}
 	},
 	"containerUser": "vscode",
 	// "containerEnv": {},
@@ -27,7 +24,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				// "github.vscode-pull-request-github"
+				"github.vscode-pull-request-github"
 			],
 			"settings": {}
 		}
